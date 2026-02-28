@@ -1,29 +1,27 @@
 import { useState } from "react";
 import "./SearchCity.css";
 
-interface SearchCityProps {
+interface Props {
   onSearch: (city: string) => void;
 }
 
-function SearchCity({ onSearch }: SearchCityProps) {
+export default function SearchCity({ onSearch }: Props) {
   const [city, setCity] = useState("");
 
-  function handleClick() {
-    if (!city.trim()) return;
-    onSearch(city);
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    onSearch(city.trim());
   }
 
   return (
-    <div className="search-container">
+    <form className="search" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Digite a cidade (ex: Peruíbe SP)"
+        placeholder="Digite uma cidade..."
         value={city}
         onChange={(e) => setCity(e.target.value)}
       />
-      <button onClick={handleClick}>Buscar</button>
-    </div>
+      <button type="submit">Buscar</button>
+    </form>
   );
 }
-
-export default SearchCity;

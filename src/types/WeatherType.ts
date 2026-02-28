@@ -1,0 +1,1 @@
+export type WeatherType = "sun" | "cloudy" | "rain" | "snow";

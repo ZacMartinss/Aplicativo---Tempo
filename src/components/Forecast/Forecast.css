@@ -1,0 +1,30 @@
+.forecast {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-top: 10px;
+}
+
+.forecast-card {
+  min-width: 90px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.forecast-day {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.forecast-max {
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.forecast-min {
+  color: #666;
+  font-size: 14px;
+}

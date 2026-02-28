@@ -1,17 +1,36 @@
+import type { Weather } from "../../types/Weather";
 import "./WeatherCard.css";
 
-interface WeatherCardProps {
-  city: string;
-  temperature: number;
-}
+type Props = {
+  weather: Weather;
+};
 
-function WeatherCard({ city, temperature }: WeatherCardProps) {
+export default function WeatherCard({ weather }: Props) {
   return (
-    <div className="weather-card">
-      <h2>{city}</h2>
-      <p className="temperature">{temperature}°C</p>
+    <div className="weather-cards">
+      <div className="card">
+        🌡️
+        <span>Temperatura</span>
+        <strong>{weather.temperature_2m}°C</strong>
+      </div>
+
+      <div className="card">
+        😎
+        <span>Sensação</span>
+        <strong>{weather.apparent_temperature}°C</strong>
+      </div>
+
+      <div className="card">
+        💧
+        <span>Umidade</span>
+        <strong>{weather.relative_humidity_2m}%</strong>
+      </div>
+
+      <div className="card">
+        💨
+        <span>Vento</span>
+        <strong>{weather.wind_speed_10m} km/h</strong>
+      </div>
     </div>
   );
 }
-
-export default WeatherCard;

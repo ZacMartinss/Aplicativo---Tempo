@@ -1,23 +1,48 @@
 import { useState } from "react";
+import "./App.css";
+
 import { getWeatherByCity } from "./services/WeatherApi";
+import type { Weather } from "./types/Weather";
+
+import { AnimatedBackground } from "./components/AnimatedBackground/AnimatedBackground";
+import SearchCity from "./components/SearchCity/SearchCity";
+import WeatherCard from "./components/WeatherCard/WeatherCard";
+import { Forecast } from "./components/Forecast/Forecast";
+
 import { getWeatherBackgroundByTemp } from "./utils/getWeatherBackground";
+import { getWeatherType } from "./utils/getWeatherType";
+
+/* 🔒 Tipo local para UI (não mexe no Weather.ts) */
+interface WeatherUI extends Weather {
+  city: string;
+  daily?: any;
+}
 
 function App() {
-  const [city, setCity] = useState("");
-  const [temperature, setTemperature] = useState<number | null>(null);
+  const [weather, setWeather] = useState<WeatherUI | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSearch() {
+  async function handleSearch(city: string) {
     if (!city) return;
 
     setLoading(true);
     setError("");
-    setTemperature(null);
+    setWeather(null);
 
     try {
-      const weather = await getWeatherByCity(city);
-      setTemperature(weather.temperature);
+      const data = await getWeatherByCity(city);
+
+      const mappedWeather: WeatherUI = {
+        city,
+        temperature_2m: data.current.temperature_2m,
+        apparent_temperature: data.current.apparent_temperature,
+        relative_humidity_2m: data.current.relative_humidity_2m,
+        wind_speed_10m: data.current.wind_speed_10m,
+        daily: data.daily,
+      };
+
+      setWeather(mappedWeather);
     } catch {
       setError("Não foi possível buscar o clima 😕");
     } finally {
@@ -25,49 +50,49 @@ function App() {
     }
   }
 
-  const backgroundImage =
-    temperature !== null ? getWeatherBackgroundByTemp(temperature) : "";
+  const backgroundImage = weather
+    ? getWeatherBackgroundByTemp(weather.temperature_2m)
+    : "";
+
+  const weatherType = weather ? getWeatherType(weather) : null;
 
   return (
     <div
+      className="app"
       style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        transition: "background-image 0.5s ease-in-out",
+        backgroundImage: backgroundImage
+          ? `url(${backgroundImage})`
+          : undefined,
       }}
     >
-      <div style={{
-        background: "rgba(0,0,0,0.55)",
-        padding: 30,
-        borderRadius: 12,
-        color: "#fff",
-        textAlign: "center",
-        width: 320
-      }}>
-        <h1>🌤️ App de Clima</h1>
+      {weatherType && <AnimatedBackground type={weatherType} />}
 
-        <input
-          type="text"
-          placeholder="Digite a cidade"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          style={{ width: "100%", padding: 10, marginTop: 15, borderRadius: 8, border: "none" }}
-        />
+      <div className="content">
+        {/* HEADER */}
+        <h1 className="title">Tempfy</h1>
+        <p className="subtitle">Clima em tempo real, simples e bonito ☁️</p>
 
-        <button onClick={handleSearch} style={{ width: "100%", padding: 10, marginTop: 15, borderRadius: 8, border: "none", backgroundColor: "#3b82f6", color: "#fff", cursor: "pointer" }}>
-          Buscar
-        </button>
+        {/* BUSCA */}
+        <SearchCity onSearch={handleSearch} />
 
-        {loading && <p>Carregando...</p>}
+        {loading && <p className="status">Carregando...</p>}
+        {error && <p className="error">{error}</p>}
 
-        {temperature !== null && <p style={{ marginTop: 20, fontSize: 18 }}>Temperatura: {temperature}°C</p>}
+        {/* CIDADE + TEMPERATURA */}
+        {weather && (
+          <div className="location-highlight">
+            <h2 className="city-name">{weather.city}</h2>
+            <div className="main-temp">
+              {Math.round(weather.temperature_2m)}°C
+            </div>
+          </div>
+        )}
 
-        {error && <p style={{ marginTop: 15, color: "#f87171" }}>{error}</p>}
+        {/* CARDS */}
+        {weather && <WeatherCard weather={weather} />}
+
+        {/* PREVISÃO */}
+        {weather?.daily && <Forecast daily={weather.daily} />}
       </div>
     </div>
   );
