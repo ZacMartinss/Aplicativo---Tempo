@@ -1,34 +1,42 @@
-import "./Forecast.css";
-
-type DailyForecast = {
+interface DailyForecast {
   time: string[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
-};
+}
 
-type Props = {
+interface Props {
   daily: DailyForecast;
-};
+}
 
-export function Forecast({ daily }: Props) {
+export default function Forecast({ daily }: Props) {
   return (
-    <div className="forecast">
-      {daily.time.slice(0, 5).map((day, index) => (
-        <div key={day} className="forecast-card">
-          <p className="forecast-day">
-            {new Date(day).toLocaleDateString("pt-BR", {
-              weekday: "short",
-            })}
-          </p>
+    <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-md">
+      <h3 className="text-lg font-light mb-4 opacity-80">
+        Próximos dias
+      </h3>
 
-          <p className="forecast-max">
-            ⬆ {daily.temperature_2m_max[index]}°
-          </p>
-          <p className="forecast-min">
-            ⬇ {daily.temperature_2m_min[index]}°
-          </p>
-        </div>
-      ))}
+      <div className="flex flex-col gap-3">
+        {daily.time.slice(0, 5).map((day, index) => (
+          <div
+            key={day}
+            className="flex justify-between items-center border-b border-white/10 pb-2"
+          >
+            <span className="text-sm">
+              {new Date(day).toLocaleDateString("pt-BR", {
+                weekday: "short",
+              })}
+            </span>
+
+            <span className="text-sm opacity-80">
+              ↑ {Math.round(daily.temperature_2m_max[index])}°
+            </span>
+
+            <span className="text-sm opacity-60">
+              ↓ {Math.round(daily.temperature_2m_min[index])}°
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
